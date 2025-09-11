@@ -6,10 +6,20 @@
     <title>Photo boooth</title>
 </head>
 <body>
-    Hi hi, this a  photo booth ouhouh 
+    <p>Hi hi, this a  photo booth ouhouh </p>
+    <div id="webcamContainer">
     <video id="webcamVideo" autoplay></video>
+    </div>
+    <div id="photoTakeContainer">
+        <button id="takePhotoBtn">Take Photo</button>
+    </div>
+    <div>
+        <canvas id="photoCanvas" style="display:none;"></canvas>
+    </div>
+
 
     <script>
+        allPhotos = [];
         const webcamVideo = document.getElementById('webcamVideo');
 
         navigator.mediaDevices.getUserMedia({video: true})
@@ -19,7 +29,23 @@
             .catch(err => {
                 console.error("Error accessing webcam: ", err);
             });
+        
+        const takePhotoBtn = document.getElementById('takePhotoBtn');
 
+        takePhotoBtn.addEventListener('click',()=>{
+            const photoCanvas = document.getElementById('photoCanvas');
+            const context = photoCanvas.getContext('2d');
+            photoCanvas.width = webcamVideo.videoWidth;
+            photoCanvas.height = webcamVideo.videoHeight;
+            context.drawImage(webcamVideo, 0, 0, photoCanvas.width, photoCanvas.height);
+            const imageDataURL = photoCanvas.toDataURL('image/png');
+            console.log(imageDataURL); 
+            allPhotos.push(imageDataURL);
+            allPhotos.append()
+        })
+
+
+        
     </script>
 </body>
 </html>
