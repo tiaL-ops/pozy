@@ -16,6 +16,10 @@
     <div>
         <canvas id="photoCanvas" style="display:none;"></canvas>
     </div>
+    <div>
+        <h2>All Photos</h2>
+        <div id="photosContainer"></div>
+    </div>
 
 
     <script>
@@ -32,6 +36,16 @@
         
         const takePhotoBtn = document.getElementById('takePhotoBtn');
 
+        function renderPhotos(){
+            photosContainer.innerHTML = '';
+            allPhotos.forEach(photo => {
+                const img = document.createElement('img');
+                img.src = photo;
+                img.width = 200;
+                photosContainer.appendChild(img);
+            });
+        }
+
         takePhotoBtn.addEventListener('click',()=>{
             const photoCanvas = document.getElementById('photoCanvas');
             const context = photoCanvas.getContext('2d');
@@ -39,10 +53,12 @@
             photoCanvas.height = webcamVideo.videoHeight;
             context.drawImage(webcamVideo, 0, 0, photoCanvas.width, photoCanvas.height);
             const imageDataURL = photoCanvas.toDataURL('image/png');
-            console.log(imageDataURL); 
+      
             allPhotos.push(imageDataURL);
-            allPhotos.append()
+            renderPhotos();
+           
         })
+    
 
 
         
