@@ -1,67 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo boooth</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Photo booth</title>
+  
 </head>
 <body>
-    <p>Hi hi, this a  photo booth ouhouh </p>
-    <div id="webcamContainer">
-    <video id="webcamVideo" autoplay></video>
-    </div>
-    <div id="photoTakeContainer">
-        <button id="takePhotoBtn">Take Photo</button>
-    </div>
-    <div>
-        <canvas id="photoCanvas" style="display:none;"></canvas>
-    </div>
-    <div>
-        <h2>All Photos</h2>
-        <div id="photosContainer"></div>
-    </div>
+  <p>Hi hi, this a photo booth ouhouh</p>
 
+  <div id="webcamContainer">
+    <video id="webcamVideo" autoplay playsinline></video>
+  </div>
 
-    <script>
-        allPhotos = [];
-        const webcamVideo = document.getElementById('webcamVideo');
+  <div id="photoTakeContainer" style="margin:12px 0;">
+    <button id="takePhotoBtn" disabled>Take Photo</button>
+  </div>
 
-        navigator.mediaDevices.getUserMedia({video: true})
-            .then(stream => {
-                webcamVideo.srcObject = stream;
-            })
-            .catch(err => {
-                console.error("Error accessing webcam: ", err);
-            });
-        
-        const takePhotoBtn = document.getElementById('takePhotoBtn');
+  <canvas id="photoCanvas" style="display:none;"></canvas>
 
-        function renderPhotos(){
-            photosContainer.innerHTML = '';
-            allPhotos.forEach(photo => {
-                const img = document.createElement('img');
-                img.src = photo;
-                img.width = 200;
-                photosContainer.appendChild(img);
-            });
-        }
+  <div>
+    <h2>All Photos</h2>
+    <div id="photosContainer"></div>
+  </div>
 
-        takePhotoBtn.addEventListener('click',()=>{
-            const photoCanvas = document.getElementById('photoCanvas');
-            const context = photoCanvas.getContext('2d');
-            photoCanvas.width = webcamVideo.videoWidth;
-            photoCanvas.height = webcamVideo.videoHeight;
-            context.drawImage(webcamVideo, 0, 0, photoCanvas.width, photoCanvas.height);
-            const imageDataURL = photoCanvas.toDataURL('image/png');
-      
-            allPhotos.push(imageDataURL);
-            renderPhotos();
-           
-        })
+  <script>
+    const allPhotos = []; 
+    const webcamVideo = document.getElementById('webcamVideo');
+    const takePhotoBtn = document.getElementById('takePhotoBtn');
+    const photosContainer = document.getElementById('photosContainer');
+    const photoCanvas = document.getElementById('photoCanvas');
+
+   
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => { webcamVideo.srcObject = stream; })
+      .catch(err => { console.error("Error accessing webcam: ", err); });
+
     
+    webcamVideo.addEventListener('loadedmetadata', () => {
+      takePhotoBtn.disabled = false;
+    });
 
+    function renderPhotos() {
+      photosContainer.innerHTML = '';
+      allPhotos.forEach((photoUrl, index) => {
+        const card = document.createElement('div');
+        card.className = 'photoCard';
 
-        
-    </script>
+        const img = document.createElement('img');
+        img.src = photoUrl;
+        img.alt = `Captured photo #${index + 1}`;
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+
+        // Create a download link (JPEG)
+        const a = document.createElement('a');
+        a.href = photoUrl;
+        a.className = 'button';
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+        a.download = `photobooth-${stamp}-${index + 1}.jpg`;
+        a.textContent = 'Download JPG';
+
+        actions.appendChild(a);
+        card.appendChild(img);
+        card.appendChild(actions);
+        photosContainer.appendChild(card);
+      });
+    }
+
+    takePhotoBtn.addEventListener('click', () => {
+     
+      photoCanvas.width = webcamVideo.videoWidth;
+      photoCanvas.height = webcamVideo.videoHeight;
+      const ctx = photoCanvas.getContext('2d');
+      ctx.drawImage(webcamVideo, 0, 0, photoCanvas.width, photoCanvas.height);
+
+     
+      const jpegDataURL = photoCanvas.toDataURL('image/jpeg', 0.92);
+
+    
+      allPhotos.push(jpegDataURL);
+      renderPhotos();
+    });
+  </script>
 </body>
 </html>
